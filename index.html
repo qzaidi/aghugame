@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Catcher Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preload" href="catch-sound.m4a" as="audio">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-info">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="missed">Missed: <span id="missed">0</span>/5</div>
+        </div>
+        <div id="game-area">
+            <div id="basket"></div>
+        </div>
+        <div class="game-controls">
+            <button id="start-button">Start Game</button>
+            <button id="restart-button" style="display: none;">Play Again</button>
+        </div>
+        <div id="game-over" class="hidden">
+            <h2>Game Over!</h2>
+            <p id="final-score">Your score: 0</p>
+            <p id="game-over-reason"></p>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>

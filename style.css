@@ -1,0 +1,126 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f8ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.game-container {
+    width: 500px;
+    height: 600px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+}
+
+#game-area {
+    position: relative;
+    flex-grow: 1;
+    background-color: #e9f5f9;
+    overflow: hidden;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 600' preserveAspectRatio='none'%3E%3C!-- Sunset sky gradient --%3E%3Cdefs%3E%3ClinearGradient id='skyGradient' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231a4b94;stop-opacity:1' /%3E%3Cstop offset='40%25' style='stop-color:%233973ac;stop-opacity:1' /%3E%3Cstop offset='70%25' style='stop-color:%23f08c2a;stop-opacity:1' /%3E%3Cstop offset='85%25' style='stop-color:%23f7b733;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23ffcc66;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1000' height='600' fill='url(%23skyGradient)' /%3E%3C!-- Clouds --%3E%3Cg fill='%23f2f2f2' opacity='0.8'%3E%3Cpath d='M100,120 Q130,100 160,110 Q180,90 210,100 Q240,90 260,110 Q290,100 310,120 Q290,140 260,130 Q240,150 210,140 Q180,150 160,130 Q130,140 100,120 Z' /%3E%3Cpath d='M600,150 Q630,130 660,140 Q680,120 710,130 Q740,120 760,140 Q790,130 810,150 Q790,170 760,160 Q740,180 710,170 Q680,180 660,160 Q630,170 600,150 Z' /%3E%3Cpath d='M800,100 Q830,80 860,90 Q880,70 910,80 Q940,70 960,90 Q990,80 1010,100 Q990,120 960,110 Q940,130 910,120 Q880,130 860,110 Q830,120 800,100 Z' /%3E%3C/g%3E%3C!-- Snow-capped Alborz Mountains --%3E%3Cpath d='M0,350 Q50,320 100,340 Q150,300 200,330 Q250,280 300,320 Q350,270 400,310 Q450,250 500,300 Q550,230 600,290 Q650,260 700,300 Q750,270 800,310 Q850,280 900,320 Q950,300 1000,330 L1000,600 L0,600 Z' fill='%23555b61' /%3E%3C!-- Snow caps on mountains --%3E%3Cpath d='M0,350 Q50,320 100,340 Q150,300 200,330 Q250,280 300,320 Q350,270 400,310 Q450,250 500,300 Q550,230 600,290 Q650,260 700,300 Q750,270 800,310 Q850,280 900,320 Q950,300 1000,330 L1000,360 Q950,330 900,350 Q850,310 800,340 Q750,300 700,330 Q650,290 600,320 Q550,260 500,330 Q450,280 400,340 Q350,300 300,350 Q250,310 200,360 Q150,330 100,370 Q50,350 0,380 Z' fill='%23ffffff' /%3E%3C!-- Tehran cityscape silhouette --%3E%3Cpath d='M0,450 L40,450 L50,440 L60,450 L70,440 L80,450 L90,440 L100,450 L110,440 L120,450 L130,440 L140,450 L150,440 L160,450 L170,440 L180,450 L190,440 L200,450 L210,440 L220,450 L230,440 L240,450 L250,440 L260,450 L270,440 L280,450 L290,440 L300,450 L310,440 L320,450 L330,440 L340,450 L350,440 L360,450 L370,440 L380,450 L390,440 L400,450 L410,440 L420,450 L430,440 L440,450 L450,440 L460,450 L470,440 L480,450 L490,440 L500,450 L510,440 L520,450 L530,440 L540,450 L550,440 L560,450 L570,440 L580,450 L590,440 L600,450 L610,440 L620,450 L630,440 L640,450 L650,440 L660,450 L670,440 L680,450 L690,440 L700,450 L710,440 L720,450 L730,440 L740,450 L750,440 L760,450 L770,440 L780,450 L790,440 L800,450 L810,440 L820,450 L830,440 L840,450 L850,440 L860,450 L870,440 L880,450 L890,440 L900,450 L910,440 L920,450 L930,440 L940,450 L950,440 L960,450 L970,440 L980,450 L990,440 L1000,450 L1000,600 L0,600 Z' fill='%23333333' /%3E%3C!-- Milad Tower --%3E%3Cpath d='M500,450 L495,200 L505,200 L500,450 Z' fill='%23666666' /%3E%3Cpath d='M485,200 L515,200 L510,180 L490,180 Z' fill='%23888888' /%3E%3Cpath d='M490,180 L510,180 L505,150 L495,150 Z' fill='%23666666' /%3E%3Cpath d='M495,150 L505,150 L502,120 L498,120 Z' fill='%23888888' /%3E%3Ccircle cx='500' cy='110' r='10' fill='%23aaaaaa' /%3E%3Cpath d='M495,120 L505,120 L500,110 Z' fill='%23888888' /%3E%3C!-- Tower reflection/highlight --%3E%3Cpath d='M497,200 L499,200 L499,120 L497,120 Z' fill='%23ffffff' opacity='0.3' /%3E%3C!-- Buildings with lit windows --%3E%3Cg%3E%3Crect x='420' y='400' width='40' height='50' fill='%23444444' /%3E%3Crect x='540' y='410' width='50' height='40' fill='%23555555' /%3E%3Crect x='600' y='420' width='35' height='30' fill='%23444444' /%3E%3Crect x='350' y='410' width='45' height='40' fill='%23555555' /%3E%3Crect x='650' y='415' width='40' height='35' fill='%23444444' /%3E%3C/g%3E%3C!-- Windows on buildings --%3E%3Cg fill='%23ffcc66' opacity='0.8'%3E%3Crect x='425' y='405' width='5' height='5' /%3E%3Crect x='435' y='405' width='5' height='5' /%3E%3Crect x='445' y='405' width='5' height='5' /%3E%3Crect x='425' y='415' width='5' height='5' /%3E%3Crect x='435' y='415' width='5' height='5' /%3E%3Crect x='445' y='415' width='5' height='5' /%3E%3Crect x='425' y='425' width='5' height='5' /%3E%3Crect x='435' y='425' width='5' height='5' /%3E%3Crect x='445' y='425' width='5' height='5' /%3E%3Crect x='425' y='435' width='5' height='5' /%3E%3Crect x='435' y='435' width='5' height='5' /%3E%3Crect x='445' y='435' width='5' height='5' /%3E%3Crect x='545' y='415' width='5' height='5' /%3E%3Crect x='555' y='415' width='5' height='5' /%3E%3Crect x='565' y='415' width='5' height='5' /%3E%3Crect x='575' y='415' width='5' height='5' /%3E%3Crect x='545' y='425' width='5' height='5' /%3E%3Crect x='555' y='425' width='5' height='5' /%3E%3Crect x='565' y='425' width='5' height='5' /%3E%3Crect x='575' y='425' width='5' height='5' /%3E%3Crect x='545' y='435' width='5' height='5' /%3E%3Crect x='555' y='435' width='5' height='5' /%3E%3Crect x='565' y='435' width='5' height='5' /%3E%3Crect x='575' y='435' width='5' height='5' /%3E%3Crect x='605' y='425' width='5' height='5' /%3E%3Crect x='615' y='425' width='5' height='5' /%3E%3Crect x='625' y='425' width='5' height='5' /%3E%3Crect x='605' y='435' width='5' height='5' /%3E%3Crect x='615' y='435' width='5' height='5' /%3E%3Crect x='625' y='435' width='5' height='5' /%3E%3Crect x='355' y='415' width='5' height='5' /%3E%3Crect x='365' y='415' width='5' height='5' /%3E%3Crect x='375' y='415' width='5' height='5' /%3E%3Crect x='385' y='415' width='5' height='5' /%3E%3Crect x='355' y='425' width='5' height='5' /%3E%3Crect x='365' y='425' width='5' height='5' /%3E%3Crect x='375' y='425' width='5' height='5' /%3E%3Crect x='385' y='425' width='5' height='5' /%3E%3Crect x='355' y='435' width='5' height='5' /%3E%3Crect x='365' y='435' width='5' height='5' /%3E%3Crect x='375' y='435' width='5' height='5' /%3E%3Crect x='385' y='435' width='5' height='5' /%3E%3Crect x='655' y='420' width='5' height='5' /%3E%3Crect x='665' y='420' width='5' height='5' /%3E%3Crect x='675' y='420' width='5' height='5' /%3E%3Crect x='655' y='430' width='5' height='5' /%3E%3Crect x='665' y='430' width='5' height='5' /%3E%3Crect x='675' y='430' width='5' height='5' /%3E%3Crect x='655' y='440' width='5' height='5' /%3E%3Crect x='665' y='440' width='5' height='5' /%3E%3Crect x='675' y='440' width='5' height='5' /%3E%3C/g%3E%3C/svg%3E");
+    background-size: cover;
+    background-position: bottom;
+}
+
+#basket {
+    position: absolute;
+    width: 80px;
+    height: 120px; /* Increased height for the kid figure */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    bottom: 0px; /* Position at the bottom of game area */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.fruit, .bomb {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 5;
+}
+
+.game-controls {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    background-color: #f5f5f5;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Fruit and bomb images */
+.apple {
+    background-image: url('apple.png');
+}
+
+.banana {
+    background-image: url('banana.png');
+}
+
+.orange {
+    background-image: url('orange.png');
+}
+
+.strawberry {
+    background-image: url('strawberry.png');
+}
+
+.bomb {
+    background-image: url('bomb.png');
+}
