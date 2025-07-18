@@ -6,24 +6,61 @@
     <title>Fruit Catcher Game</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preload" href="catch-sound.m4a" as="audio">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
 </head>
 <body>
     <div class="game-container">
-        <div class="game-info">
-            <div class="score">Score: <span id="score">0</span></div>
-            <div class="missed">Missed: <span id="missed">0</span>/5</div>
+        <!-- Login Screen -->
+        <div id="login-screen">
+            <h2>Welcome to Fruit Catcher!</h2>
+            <div class="login-form">
+                <input type="text" id="player-name" placeholder="Enter your name" maxlength="15">
+                <button id="login-button">Play Game</button>
+            </div>
+            <div id="login-error" class="hidden">Please enter your name to continue</div>
         </div>
-        <div id="game-area">
-            <div id="basket"></div>
+        
+        <!-- High Scores Screen -->
+        <div id="high-scores-screen" class="hidden">
+            <h2>High Scores</h2>
+            <div id="high-scores-list">
+                <!-- High scores will be populated here -->
+            </div>
+            <button id="back-to-game-button">Back to Game</button>
         </div>
-        <div class="game-controls">
-            <button id="start-button">Start Game</button>
-            <button id="restart-button" style="display: none;">Play Again</button>
-        </div>
-        <div id="game-over" class="hidden">
-            <h2>Game Over!</h2>
-            <p id="final-score">Your score: 0</p>
-            <p id="game-over-reason"></p>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <div class="game-info">
+                <div class="player-info">Player: <span id="player-display">Guest</span></div>
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="missed">Missed: <span id="missed">0</span>/5</div>
+                <div class="high-score-button" id="view-high-scores">High Scores</div>
+            </div>
+            <div id="game-area">
+                <div id="basket"></div>
+            </div>
+            <div class="game-controls">
+                <button id="start-button">Start Game</button>
+                <button id="restart-button" style="display: none;">Play Again</button>
+            </div>
+            <div id="game-over" class="hidden">
+                <h2>Game Over!</h2>
+                <p id="final-score">Your score: 0</p>
+                <p id="game-over-reason"></p>
+                <div id="new-high-score" class="hidden">
+                    <h3>New High Score!</h3>
+                    <p>Your score has been saved to the leaderboard.</p>
+                </div>
+                <button id="view-leaderboard-button">View Leaderboard</button>
+            </div>
         </div>
     </div>
     <script src="game.js"></script>

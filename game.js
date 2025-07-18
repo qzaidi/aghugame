@@ -8,6 +8,11 @@ let gameItems = [];
 let basketPosition = 50; // Percentage from left
 let fruitSpawnCount = 1; // Number of fruits to spawn at once - increases over time
 
+// User variables
+let currentUser = null;
+let playerName = "Guest";
+let isAuthenticated = false;
+
 // DOM Elements
 const gameArea = document.getElementById('game-area');
 const basket = document.getElementById('basket');
@@ -18,6 +23,20 @@ const restartButton = document.getElementById('restart-button');
 const gameOverScreen = document.getElementById('game-over');
 const finalScoreDisplay = document.getElementById('final-score');
 const gameOverReason = document.getElementById('game-over-reason');
+
+// Login elements
+const loginScreen = document.getElementById('login-screen');
+const gameScreen = document.getElementById('game-screen');
+const highScoresScreen = document.getElementById('high-scores-screen');
+const playerNameInput = document.getElementById('player-name');
+const loginButton = document.getElementById('login-button');
+const loginError = document.getElementById('login-error');
+const playerDisplay = document.getElementById('player-display');
+const viewHighScoresButton = document.getElementById('view-high-scores');
+const backToGameButton = document.getElementById('back-to-game-button');
+const highScoresList = document.getElementById('high-scores-list');
+const newHighScoreDisplay = document.getElementById('new-high-score');
+const viewLeaderboardButton = document.getElementById('view-leaderboard-button');
 
 // Sound effect for catching fruit
 const catchSound = new Audio('catch-sound.m4a');
@@ -33,9 +52,25 @@ const fruitTypes = [
 // Bomb probability (increases with score)
 let bombProbability = 0.1;
 
-// Event Listeners
+// Initialize Firebase when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Firebase
+    if (window.firebaseHelper) {
+        window.firebaseHelper.initializeFirebase();
+    } else {
+        console.error('Firebase helper not loaded');
+    }
+});
+
+// Event Listeners for game controls
 startButton.addEventListener('click', startGame);
 restartButton.addEventListener('click', restartGame);
+
+// Event listeners for login and high scores
+loginButton.addEventListener('click', handleLogin);
+viewHighScoresButton.addEventListener('click', showHighScores);
+backToGameButton.addEventListener('click', showGameScreen);
+viewLeaderboardButton.addEventListener('click', showHighScores);
 
 // Mouse movement for basket control
 gameArea.addEventListener('mousemove', moveBasket);
@@ -49,6 +84,107 @@ gameArea.addEventListener('touchmove', (e) => {
     const percentage = (touchX / gameAreaRect.width) * 100;
     moveBasketToPosition(percentage);
 });
+
+// Login functions
+async function handleLogin() {
+    playerName = playerNameInput.value.trim();
+    
+    if (!playerName) {
+        loginError.classList.remove('hidden');
+        return;
+    }
+    
+    loginError.classList.add('hidden');
+    
+    try {
+        // Create user with the provided name
+        if (window.firebaseHelper) {
+            currentUser = await window.firebaseHelper.createUserWithNameAndPlay(playerName);
+            isAuthenticated = !!currentUser;
+            
+            if (isAuthenticated) {
+                console.log('User authenticated:', currentUser.uid);
+            } else {
+                console.warn('Failed to authenticate user, continuing as guest');
+            }
+        } else {
+            console.warn('Firebase helper not available, continuing as guest');
+        }
+        
+        // Update player display
+        playerDisplay.textContent = playerName;
+        
+        // Show game screen
+        showGameScreen();
+    } catch (error) {
+        console.error('Login error:', error);
+        loginError.textContent = 'Error logging in. Please try again.';
+        loginError.classList.remove('hidden');
+    }
+}
+
+// Screen management functions
+function showLoginScreen() {
+    loginScreen.classList.remove('hidden');
+    gameScreen.classList.add('hidden');
+    highScoresScreen.classList.add('hidden');
+}
+
+function showGameScreen() {
+    loginScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    highScoresScreen.classList.add('hidden');
+}
+
+async function showHighScores() {
+    loginScreen.classList.add('hidden');
+    gameScreen.classList.add('hidden');
+    highScoresScreen.classList.remove('hidden');
+    
+    // Clear previous high scores
+    highScoresList.innerHTML = '';
+    
+    try {
+        // Get high scores from Firebase
+        if (window.firebaseHelper) {
+            const highScores = await window.firebaseHelper.getTopHighScores(10);
+            
+            if (highScores.length === 0) {
+                highScoresList.innerHTML = '<p>No high scores yet. Be the first!</p>';
+                return;
+            }
+            
+            // Display high scores
+            highScores.forEach((score, index) => {
+                const scoreEntry = document.createElement('div');
+                scoreEntry.className = 'high-score-entry';
+                
+                const rankElement = document.createElement('div');
+                rankElement.className = 'high-score-rank';
+                rankElement.textContent = `${index + 1}.`;
+                
+                const nameElement = document.createElement('div');
+                nameElement.className = 'high-score-name';
+                nameElement.textContent = score.userName;
+                
+                const scoreElement = document.createElement('div');
+                scoreElement.className = 'high-score-score';
+                scoreElement.textContent = score.score;
+                
+                scoreEntry.appendChild(rankElement);
+                scoreEntry.appendChild(nameElement);
+                scoreEntry.appendChild(scoreElement);
+                
+                highScoresList.appendChild(scoreEntry);
+            });
+        } else {
+            highScoresList.innerHTML = '<p>High scores unavailable. Firebase not initialized.</p>';
+        }
+    } catch (error) {
+        console.error('Error fetching high scores:', error);
+        highScoresList.innerHTML = '<p>Error loading high scores. Please try again later.</p>';
+    }
+}
 
 // Create placeholder images for preloading
 function preloadImages() {
@@ -462,13 +598,44 @@ function moveBasketToPosition(percentage) {
 }
 
 // End the game
-function endGame(reason) {
+async function endGame(reason) {
     gameRunning = false;
     clearInterval(spawnInterval);
     
     // Show game over screen
     finalScoreDisplay.textContent = `Your score: ${score}`;
     gameOverReason.textContent = reason;
+    
+    // Save high score if user is authenticated
+    let isNewHighScore = false;
+    if (isAuthenticated && currentUser && window.firebaseHelper) {
+        try {
+            await window.firebaseHelper.saveHighScore(currentUser.uid, playerName, score);
+            
+            // Check if this is a new high score by getting the top scores
+            const highScores = await window.firebaseHelper.getTopHighScores(10);
+            
+            // If the score is in the top 10, consider it a new high score
+            isNewHighScore = highScores.some(entry => 
+                entry.userId === currentUser.uid && 
+                entry.score === score && 
+                // Check if the timestamp is recent (within the last minute)
+                entry.timestamp > (Date.now() - 60000)
+            );
+            
+            if (isNewHighScore) {
+                newHighScoreDisplay.classList.remove('hidden');
+            } else {
+                newHighScoreDisplay.classList.add('hidden');
+            }
+        } catch (error) {
+            console.error('Error saving high score:', error);
+            newHighScoreDisplay.classList.add('hidden');
+        }
+    } else {
+        newHighScoreDisplay.classList.add('hidden');
+    }
+    
     gameOverScreen.classList.remove('hidden');
     
     // Show restart button
@@ -479,4 +646,10 @@ function endGame(reason) {
 window.addEventListener('load', () => {
     // Set initial basket position
     basket.style.left = `${basketPosition}%`;
+    
+    // Preload images
+    preloadImages();
+    
+    // Show login screen by default
+    showLoginScreen();
 });

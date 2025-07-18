@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Test</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px 0; padding: 8px 16px; }
+        #output { margin-top: 20px; border: 1px solid #ccc; padding: 10px; min-height: 200px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Firebase Test</h1>
+    <div style="background-color: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #bee5eb;">
+        <strong>ℹ️ Information:</strong> This page tests Firebase authentication and high score functionality.
+        <p>Follow the numbered steps to test each part of the Firebase integration.</p>
+        <p>Check the browser console (F12) for additional debugging information.</p>
+    </div>
+    <div>
+        <button id="init-btn">1. Initialize Firebase</button>
+        <button id="login-btn" disabled>2. Login Anonymously</button>
+        <button id="save-score-btn" disabled>3. Save Test Score</button>
+        <button id="get-scores-btn" disabled>4. Get High Scores</button>
+    </div>
+    <div id="output"></div>
+
+    <script>
+        // DOM Elements
+        const initBtn = document.getElementById('init-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const saveScoreBtn = document.getElementById('save-score-btn');
+        const getScoresBtn = document.getElementById('get-scores-btn');
+        const output = document.getElementById('output');
+        
+        // Test variables
+        let currentUser = null;
+        const testPlayerName = 'TestPlayer_' + Math.floor(Math.random() * 1000);
+        const testScore = Math.floor(Math.random() * 100);
+        
+        // Log function
+        function log(message, isError = false) {
+            const entry = document.createElement('div');
+            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            entry.className = isError ? 'error' : 'success';
+            output.appendChild(entry);
+            console.log(message);
+        }
+        
+        // Initialize Firebase
+        initBtn.addEventListener('click', async () => {
+            try {
+                if (typeof window.firebaseHelper === 'undefined') {
+                    throw new Error('Firebase helper not found. Check if firebase-config.js is loaded correctly.');
+                }
+                
+                // Try direct initialization first
+                try {
+                    log('Attempting direct Firebase initialization...');
+                    // Check if Firebase is already initialized
+                    if (firebase.apps && firebase.apps.length > 0) {
+                        log('Firebase already initialized, using existing instance');
+                    } else {
+                        // Get config from the global variable in firebase-config.js
+                        const config = firebaseConfig;
+                        log(`Using Firebase config with projectId: ${config.projectId}`);
+                        firebase.initializeApp(config);
+                    }
+                    log('Direct Firebase initialization successful');
+                    loginBtn.disabled = false;
+                } catch (directError) {
+                    log(`Direct initialization failed: ${directError.message}`, true);
+                    log('Falling back to helper method...');
+                    
+                    // Fall back to helper method
+                    const success = window.firebaseHelper.initializeFirebase();
+                    if (success) {
+                        log('Firebase initialized successfully via helper');
+                        loginBtn.disabled = false;
+                    } else {
+                        throw new Error('Firebase initialization returned false');
+                    }
+                }
+            } catch (error) {
+                log(`Error initializing Firebase: ${error.message}`, true);
+                log('Check console (F12) for more details', true);
+            }
+        });
+        
+        // Login anonymously
+        loginBtn.addEventListener('click', async () => {
+            try {
+                log('Attempting anonymous login...');
+                
+                // Try direct Firebase auth first
+                try {
+                    log('Trying direct Firebase auth...');
+                    const userCredential = await firebase.auth().signInAnonymously();
+                    currentUser = userCredential.user;
+                    log(`Logged in anonymously with UID: ${currentUser.uid}`);
+                    saveScoreBtn.disabled = false;
+                    getScoresBtn.disabled = false;
+                } catch (directAuthError) {
+                    log(`Direct auth failed: ${directAuthError.message}`, true);
+                    log('Error code: ' + directAuthError.code);
+                    log('Falling back to helper method...');
+                    
+                    // Fall back to helper method
+                    currentUser = await window.firebaseHelper.createUserWithNameAndPlay(testPlayerName);
+                    if (currentUser) {
+                        log(`Logged in as ${testPlayerName} with UID: ${currentUser.uid}`);
+                        saveScoreBtn.disabled = false;
+                        getScoresBtn.disabled = false;
+                    } else {
+                        throw new Error('Failed to login');
+                    }
+                }
+            } catch (error) {
+                log(`Error logging in: ${error.message}`, true);
+                log('Check browser console (F12) for more details', true);
+                
+                // Display Firebase config for debugging
+                if (typeof firebaseConfig !== 'undefined') {
+                    log('Current Firebase config:', false);
+                    log(`- apiKey: ${firebaseConfig.apiKey.substring(0, 5)}...`, false);
+                    log(`- authDomain: ${firebaseConfig.authDomain}`, false);
+                    log(`- projectId: ${firebaseConfig.projectId}`, false);
+                    log(`- databaseURL: ${firebaseConfig.databaseURL}`, false);
+                }
+            }
+        });
+        
+        // Save test score
+        saveScoreBtn.addEventListener('click', async () => {
+            try {
+                if (!currentUser) {
+                    throw new Error('No user logged in');
+                }
+                
+                log(`Attempting to save score: ${testScore} for user: ${testPlayerName}`);
+                const success = await window.firebaseHelper.saveHighScore(currentUser.uid, testPlayerName, testScore);
+                
+                if (success) {
+                    log(`Score ${testScore} saved successfully`);
+                } else {
+                    log('Score was not saved (not high enough or error occurred)');
+                }
+            } catch (error) {
+                log(`Error saving score: ${error.message}`, true);
+            }
+        });
+        
+        // Get high scores
+        getScoresBtn.addEventListener('click', async () => {
+            try {
+                const highScores = await window.firebaseHelper.getTopHighScores(10);
+                log(`Retrieved ${highScores.length} high scores:`);
+                
+                highScores.forEach((score, index) => {
+                    log(`${index + 1}. ${score.userName}: ${score.score}`);
+                });
+            } catch (error) {
+                log(`Error getting high scores: ${error.message}`, true);
+            }
+        });
+    </script>
+</body>
+</html>
